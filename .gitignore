@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+payloads/
+jailbreaks/
+scripts/sweep-raw.json
+scripts/sweep-top.json
+scripts/attach.json
+*.log
