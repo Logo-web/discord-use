@@ -1,8 +1,9 @@
 # discord-use
 
-OpenCode plugin: Discord user-account research + Jev triage via Vercel AI Gateway.
+Discord user-account research + Jev triage via Vercel AI Gateway.
+Works three ways: **OpenCode plugin**, **MCP server** (any agent host), **CLI** (humans + scripts).
 
-## Tools
+## Tools (all three surfaces)
 
 | Tool | What |
 |---|---|
@@ -17,18 +18,41 @@ OpenCode plugin: Discord user-account research + Jev triage via Vercel AI Gatewa
 
 ```bash
 npm install
+npm run build
 cp .env.example .env  # fill DISCORD_TOKEN + AI_GATEWAY_API_KEY
 ```
 
 ## Env
 
-- `DISCORD_TOKEN` — user account token (NOT a bot token)
-- `AI_GATEWAY_API_KEY` — Vercel gateway key (`vck_...`); Jev is called through `https://ai-gateway.vercel.sh/typesafe`
+- `DISCORD_TOKEN` — user account token (NOT a bot token). Never commit.
+- `AI_GATEWAY_API_KEY` — Vercel gateway key; Jev is called through `https://ai-gateway.vercel.sh/typesafe`
 
-## opencode
+## Use 1 — OpenCode plugin
 
 ```json
 { "plugin": ["file://./src/index.ts"] }
+```
+
+## Use 2 — MCP server (Claude Code, Cursor, Windsurf, Cline, ...)
+
+```bash
+node dist/mcp.js   # stdio
+```
+
+```json
+{ "mcpServers": { "discord-use": { "command": "node", "args": ["/abs/path/dist/mcp.js"] } } }
+```
+
+## Use 3 — CLI
+
+```bash
+node dist/cli.js guilds
+node dist/cli.js channels <guildId>
+node dist/cli.js history <channelId> [--limit N] [--before ID]
+node dist/cli.js search <guildId> <query...>
+node dist/cli.js research <channelId> <query...> [--limit N] [--topK N]
+node dist/cli.js route <goal> <candidatesJson>
+# or: npm link && discord-use guilds
 ```
 
 ## Notes

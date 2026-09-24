@@ -1,14 +1,16 @@
 {
   "name": "discord-use",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "description": "OpenCode plugin: discord user-account research + Jev triage via Vercel AI Gateway",
+  "description": "Discord user-account research + Jev triage — OpenCode plugin, MCP server, CLI",
   "main": "src/index.ts",
+  "bin": { "discord-use": "dist/cli.js" },
   "scripts": {
     "build": "tsc",
     "test": "node --test dist/*.test.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
     "@opencode-ai/plugin": "^1.18.32",
     "discord.js-selfbot-v13": "^3.0.0",
     "zod": "^4.6.5"
