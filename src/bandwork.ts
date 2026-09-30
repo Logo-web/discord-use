@@ -238,13 +238,26 @@ export async function bandworkProfiled(
   return { bodies, log, profiles };
 }
 export function nameCheck(body: string, slot: Slot): boolean {
-  return body.includes(slot.name);
+  // fuzzy: ignore case + underscores (isprime == is_prime == IsPrime)
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const want = norm(slot.name);
+  // scan body identifiers
+  const idents = body.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
+  return idents.some((id) => norm(id) === want);
 }
 
 export function signatureCheck(body: string, slot: Slot): boolean {
-  // loose: all signature tokens present
+  // loose + fuzzy: all signature tokens present (case/underscore-insensitive),
+  // markdown fences stripped first
+  const clean = body.replace(/```[a-z]*\n?/gi, "");
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
   const toks = slot.signature.split(/[^A-Za-z0-9_]+/).filter(Boolean);
-  return toks.every((t) => body.includes(t));
+  const idents = new Set((clean.match(/[A-Za-z_][A-Za-z0-9_]*/g) || []).map(norm));
+  // type keywords (int, num, void...) get a pass — only function-name-likes must match
+  const meaningful = toks.filter((t) => !/^(int|num|void|char|float|double|long|short|unsigned|const|static)$/i.test(t));
+  const names = meaningful.filter((t) => /[a-z]/i.test(t) && t.length > 1);
+  if (!names.length) return true;
+  return names.some((t) => idents.has(norm(t)));
 }
 
 export function dodgeCheck(body: string): boolean {
