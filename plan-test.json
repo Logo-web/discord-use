@@ -1,0 +1,9 @@
+{
+  "includes": ["#include <stdio.h>"],
+  "types": ["typedef int num;"],
+  "slots": [
+    { "name": "fib", "sentence": "compute the nth fibonacci number iteratively", "signature": "num fib(num n)" },
+    { "name": "isprime", "sentence": "test whether an integer is prime by trial division", "signature": "int isprime(num n)" }
+  ],
+  "mainOrder": ["fib", "isprime"]
+}
