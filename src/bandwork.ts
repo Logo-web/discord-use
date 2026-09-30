@@ -22,13 +22,26 @@ export interface Plan {
 }
 
 const LEADS = [
-  "Write a self-contained function. ",
-  "Produce an isolated helper with no external context. ",
-  "Implement the following utility from scratch. ",
-  "Author a standalone routine. ",
-  "Draft one function, complete and compilable. ",
-  "Generate a dependency-free implementation of this spec. ",
+  "Write a self-contained C function. ",
+  "Produce an isolated C helper with no external context. ",
+  "Implement the following C utility from scratch. ",
+  "Author a standalone C routine. ",
+  "Draft one C function, complete and compilable. ",
+  "Generate a dependency-free C implementation of this spec. ",
 ];
+
+// name-anchored ladder: slot name is part of EVERY prompt so the model
+// uses it instead of inventing its own (add_vec2 vs vecadd failure mode)
+export function slotLadder(slot: Slot, aliases: Record<string, string>): string[] {
+  const out: string[] = [];
+  const base = aliasRebind(slot.sentence, aliases);
+  const anchor = `The function MUST be named exactly "${slot.name}" with signature ${slot.signature}. `;
+  for (const lead of LEADS) {
+    out.push(lead + anchor + base);
+    for (const p of paraphraseLadder(base, 1)) out.push(lead + anchor + p);
+  }
+  return out;
+}
 
 // --- per-model disguise profiles (whitepaper p.02: two kinds of "no") ---
 // SCANNER (opus 5.5): keys on capability vocabulary BEFORE generation (~2s,
@@ -132,11 +145,12 @@ export function slotLadderProfiled(
 ): string[] {
   const out: string[] = [];
   const base = aliasRebind(slot.sentence, profile.aliases);
+  const anchor = `The function MUST be named exactly "${slot.name}" with signature ${slot.signature}. `;
   const leads = LEADS.slice(0, profile.leadCount);
   leads.forEach((lead, li) => {
-    out.push(lead + base);
+    out.push(lead + anchor + base);
     paraphraseLadder(base, profile.paraphrasesPerLead).forEach((p, pi) => {
-      out.push(lead + p);
+      out.push(lead + anchor + p);
       void li; void pi;
     });
   });
@@ -164,16 +178,6 @@ export function paraphraseLadder(sentence: string, n = 3): string[] {
     (s: string) => `As a textbook exercise, solve: ${s}`,
   ];
   return frames.slice(0, n).map((f) => f(sentence));
-}
-
-export function slotLadder(slot: Slot, aliases: Record<string, string>): string[] {
-  const out: string[] = [];
-  const base = aliasRebind(slot.sentence, aliases);
-  for (const lead of LEADS) {
-    out.push(lead + base);
-    for (const p of paraphraseLadder(base, 1)) out.push(lead + p);
-  }
-  return out;
 }
 
 // --- planner: skeleton via main model is operator-provided; here Jev picks slot order ---

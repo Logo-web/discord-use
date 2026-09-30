@@ -1,0 +1,11 @@
+{
+  "includes": ["#include <stdio.h>", "#include <string.h>"],
+  "types": ["typedef int num;", "typedef struct { num x; num y; } vec2;"],
+  "slots": [
+    { "name": "vecadd", "sentence": "add two 2d vectors component-wise", "signature": "vec2 vecadd(vec2 a, vec2 b)" },
+    { "name": "vecdot", "sentence": "compute the dot product of two 2d vectors", "signature": "num vecdot(vec2 a, vec2 b)" },
+    { "name": "veclen2", "sentence": "compute the squared length of a 2d vector", "signature": "num veclen2(vec2 v)" },
+    { "name": "vecprint", "sentence": "print a 2d vector as (x,y) to stdout", "signature": "void vecprint(vec2 v)" }
+  ],
+  "mainOrder": ["vecadd", "vecdot", "veclen2", "vecprint"]
+}

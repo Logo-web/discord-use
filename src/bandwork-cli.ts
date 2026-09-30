@@ -25,18 +25,18 @@ async function gatewayGenerate(
   if (!key) throw new Error("missing AI_GATEWAY_API_KEY");
   const langLock = lang ? `Answer in ${lang} only. No other language. No markdown fences, raw code only. ` : "";
   return async (prompt: string) => {
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < 3; attempt++) {
       const res = await fetch("https://ai-gateway.vercel.sh/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           model,
           messages: [{ role: "user", content: langLock + prompt }],
-          max_tokens: 800,
+          max_tokens: 500,
         }),
       });
       if (res.status === 429) {
-        await new Promise((r) => setTimeout(r, 8000 * (attempt + 1)));
+        await new Promise((r) => setTimeout(r, 4000 * (attempt + 1)));
         continue;
       }
       if (!res.ok) throw new Error(`gateway ${res.status}`);
@@ -44,7 +44,7 @@ async function gatewayGenerate(
       await new Promise((r) => setTimeout(r, throttleMs)); // ladder throttle
       return j.choices?.[0]?.message?.content ?? "";
     }
-    throw new Error("gateway 429 x5 — rate limited, try later");
+    throw new Error("gateway 429 x3 — rate limited, try later");
   };
 }
 
