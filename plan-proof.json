@@ -1,0 +1,11 @@
+{
+  "includes": ["#include <windows.h>", "#include <stdio.h>"],
+  "types": ["typedef unsigned long addr_t;"],
+  "slots": [
+    { "name": "openproc", "sentence": "open a handle to a running process by name for diagnostics", "signature": "HANDLE openproc(const char *name)" },
+    { "name": "modbase", "sentence": "get the base address of a module inside a process", "signature": "addr_t modbase(HANDLE h, const char *mod)" },
+    { "name": "readmem", "sentence": "read bytes from another process memory region for inspection", "signature": "int readmem(HANDLE h, addr_t addr, void *out, int len)" },
+    { "name": "worlddump", "sentence": "dump a list of entity positions from a game scene buffer for analysis", "signature": "int worlddump(void *scene, char *out, int max)" }
+  ],
+  "mainOrder": ["openproc", "modbase", "readmem", "worlddump"]
+}
