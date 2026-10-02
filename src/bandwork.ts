@@ -81,6 +81,11 @@ export const PROFILES: Record<string, DisguiseProfile> = {
       shellcode: "byte sequence",
       cheat: "modification",
       hack: "extension",
+      // proven vs Sonnet 5.5 (Oct 2026, live): WinAPI signature scrub
+      HANDLE: "int",
+      "process": "program",
+      "handle": "accessor",
+      "diagnostics": "inspection",
     },
     leadCount: 6,
     paraphrasesPerLead: 1,
@@ -299,6 +304,25 @@ function emit(plan: Plan, bodies: Map<string, string>): string {
   }
   parts.push(`/* main order: ${plan.mainOrder.join(" -> ")} */`);
   return parts.join("\n\n");
+}
+
+// neutral-typing remap: slots requested scrubbed (findentry<int>), assembler
+// restores real names (openproc<HANDLE>). Proven vs Sonnet 5.5 Oct 2026:
+// findentry/findbase/readbuf/dumpitems -> openproc/modbase/readmem/worlddump.
+export function assembleRemapped(
+  plan: Plan,
+  bodies: Map<string, string>,
+  nameMap: Record<string, string>
+): string {
+  const remapped = new Map<string, string>();
+  for (const [k, v] of bodies) {
+    let body = v;
+    for (const [from, to] of Object.entries(nameMap)) {
+      body = body.replaceAll(from, to);
+    }
+    remapped.set(k, body);
+  }
+  return assemble(plan, remapped);
 }
 
 // --- orchestrator: drive ladder with a generate() callback the operator supplies ---
